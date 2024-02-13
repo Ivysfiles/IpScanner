@@ -1,0 +1,52 @@
+#simple ip scanner
+import subprocess #does ip things
+import re #find certain words
+
+# Get user input for the first and last IP addresses
+firstip = input("Enter first ip address: ")
+lastip = input("Enter the last IP address: ")
+
+# function to extract the network and host portions of an IP address
+def gethost(x):
+    dotcounter = 0
+    poscounter = 0
+    for i in x:
+        if i == ".":
+            dotcounter += 1
+        if dotcounter == 3:
+            return (x[0:poscounter + 1], x[poscounter + 1:]) #get position of host 
+        poscounter += 1
+
+# Extract network and host from the first and last IP addresses
+network, firsthost = gethost(firstip)
+network, lasthost = gethost(lastip)
+
+#Print the network, first host, and last host
+print("Network:", network)
+print("First Host:", firsthost)
+print("Last Host:", lasthost)
+
+emptystring = ""
+counter = 0
+
+#  Loop through the range of host addresses and perform ping tests
+for i in range(int(firsthost), int(lasthost) +1):
+    #Execute the ping command for the current IP address
+    process = subprocess.getoutput("ping -n 1 " + Network + str(i))
+    #Concatenate the ping results to the empty string
+    emptystring += process
+
+    # Create a regular expression pattern to find "TTL=" in the ping results
+    stringneeded = re.compile(r"TTL=")
+    # Search for the pattern in the concatenated ping results
+    mo = stringneeded.search(emptystring)
+    try:
+        if mo.group() == "TTL=":
+            print(f"Host {network}{i} is UP")
+    except:
+        print("fHost {network}{i} is DOWN")
+        
+    #Reset the empty string for the next iteration
+    emptystring = ""
+
+print("Completed")
